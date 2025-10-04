@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client to Thec Job Order</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(220, 0, 0, 0.15);
+            border: 3px solid #dc0000;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #dc0000 0%, #a00000 100%);
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.03) 10px,
+                rgba(255,255,255,0.03) 20px
+            );
+            animation: slide 20s linear infinite;
+        }
+        
+        @keyframes slide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        .logo-container {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 25px;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: rotate(-5deg);
+            transition: transform 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: rotate(0deg) scale(1.05);
+        }
+        
+        .logo-text {
+            font-size: 48px;
+            font-weight: 900;
+            color: #dc0000;
+            letter-spacing: 2px;
+        }
+        
+        h1 {
+            color: white;
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            color: rgba(255,255,255,0.95);
+            font-size: 18px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .form-content {
+            padding: 50px;
+            background: white;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            color: #1a1a1a;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input[type="text"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            font-family: inherit;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #dc0000;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(220, 0, 0, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .file-upload-area {
+            border: 3px dashed #dc0000;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .file-upload-area:hover {
+            background: linear-gradient(135deg, #ffe5e5 0%, #ffd5d5 100%);
+            transform: translateY(-2px);
+        }
+        
+        .file-upload-area.dragover {
+            background: #ffe5e5;
+            border-color: #a00000;
+        }
+        
+        .file-upload-icon {
+            font-size: 48px;
+            color: #dc0000;
+            margin-bottom: 15px;
+        }
+        
+        .file-upload-text {
+            color: #dc0000;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .file-upload-hint {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        #manuscriptUpload {
+            display: none;
+        }
+        
+        .file-name {
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            color: #333;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            text-transform: none;
+            cursor: pointer;
+        }
+        
+        .checkbox-group input[type="checkbox"],
+        .checkbox-group input[type="radio"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #dc0000;
+        }
+        
+        .section-title {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 18px 25px;
+            margin: 40px -50px 30px -50px;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background: #dc0000;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .pricing-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-top: 4px solid #dc0000;
+        }
+        
+        .pricing-card label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 10px;
+        }
+        
+        .pricing-card input {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .pricing-card input:focus {
+            background: rgba(255,255,255,0.15);
+            border-color: #dc0000;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 30px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            text-transform: none;
+            cursor: pointer;
+        }
+        
+        .radio-group input[type="radio"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #dc0000;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        
+        button {
+            padding: 18px 50px;
+            font-size: 16px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #dc0000 0%, #a00000 100%);
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(220, 0, 0, 0.4);
+        }
+        
+        .btn-submit:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-reset {
+            background: white;
+            color: #1a1a1a;
+            border: 2px solid #1a1a1a;
+        }
+        
+        .btn-reset:hover {
+            background: #1a1a1a;
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .response-message {
+            display: none;
+            padding: 20px;
+            margin-top: 25px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .response-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .response-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #dc0000;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .required {
+            color: #dc0000;
+        }
+        
+        @media (max-width: 768px) {
+            .form-content {
+                padding: 30px 20px;
+            }
+            
+            .section-title {
+                margin-left: -20px;
+                margin-right: -20px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <div class="logo">
+                    <div class="logo-text">TM</div>
+                </div>
+            </div>
+            <h1>CLIENT TO THEC JOB ORDER</h1>
+            <div class="subtitle">Professional Book Printing & Publishing Services</div>
+        </div>
+        
+        <div class="form-content">
+            <form id="jobOrderForm" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">Order Date <span class="required">*</span></label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerName">Your Full Name <span class="required">*</span></label>
+                    <input type="text" id="customerName" name="customerName" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Client Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="phone" name="phone" placeholder="+234 800 000 0000" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Delivery Address <span class="required">*</span></label>
+                    <textarea id="address" name="address" placeholder="Enter your complete delivery address" required></textarea>
+                </div>
+                
+                <div class="section-title">BOOK DETAILS</div>
+                
+                <div class="form-group">
+                    <label for="bookTitle">Book Title <span class="required">*</span></label>
+                    <input type="text" id="bookTitle" name="bookTitle" placeholder="Enter your book title" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="author">Author Name(s) <span class="required">*</span></label>
+                        <input type="text" id="author" name="author" placeholder="Enter author name(s)" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="packageType">Package Type <span class="required">*</span></label>
+                        <select id="packageType" name="packageType" required>
+                            <option value="">Select Package Type</option>
+                            <option value="Basic Package">Basic Package</option>
+                            <option value="Standard Package">Standard Package</option>
+                            <option value="Standard Plus Package">Standard Plus Package</option>
+                            <option value="Premium Package">Premium Package</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bookSize">Book Size <span class="required">*</span></label>
+                        <select id="bookSize" name="bookSize" required>
+                            <option value="">Select Book Size</option>
+                            <option value="A6">A6 (105 x 148 mm)</option>
+                            <option value="A6''">A6" (4 x 6 inches)</option>
+                            <option value="A5">A5 (148 x 210 mm)</option>
+                            <option value="A5''">A5" (5.5 x 8.5 inches)</option>
+                            <option value="A4">A4 (210 x 297 mm)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="deliveryMode">Mode of Delivery <span class="required">*</span></label>
+                        <select id="deliveryMode" name="deliveryMode" required>
+                            <option value="">Select Delivery Mode</option>
+                            <option value="Pickup">Pickup</option>
+                            <option value="Waybill">Waybill</option>
+                            <option value="Cooperate">Cooperate</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="projectedPages">Total Number of Pages <span class="required">*</span></label>
+                        <input type="number" id="projectedPages" name="projectedPages" placeholder="e.g., 200" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Number of Copies <span class="required">*</span></label>
+                        <input type="number" id="quantity" name="quantity" placeholder="e.g., 100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="coverGsm">Cover Paper (GSM)</label>
+                        <input type="text" id="coverGsm" name="coverGsm" placeholder="e.g., 250gsm">
+                    </div>
+                </div>
+                
+                <div class="section-title">DESIGN SPECIFICATIONS</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fontSize">Font Size</label>
+                        <input type="text" id="fontSize" name="fontSize" placeholder="e.g., 12pt">
+                    </div>
+                    <div class="form-group">
+                        <label for="fontType">Font Type</label>
+                        <input type="text" id="fontType" name="fontType" placeholder="e.g., Times New Roman">
+                    </div>
+                    <div class="form-group">
+                        <label for="lineSpacing">Line Spacing</label>
+                        <input type="text" id="lineSpacing" name="lineSpacing" placeholder="e.g., 1.5">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bindingType">Binding Type <span class="required">*</span></label>
+                        <select id="bindingType" name="bindingType" required>
+                            <option value="">Select Binding Type</option>
+                            <option value="Perfect Binding">Perfect Binding</option>
+                            <option value="Saddle Stitch">Saddle Stitch</option>
+                            <option value="Spiral Binding">Spiral Binding</option>
+                            <option value="Hardcover">Hardcover</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="laminationType">Lamination Type</label>
+                        <select id="laminationType" name="laminationType">
+                            <option value="">Select Lamination</option>
+                            <option value="Glossy">Glossy</option>
+                            <option value="Matte">Matte</option>
+                            <option value="None">None</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="designFeatures">Design Features <span class="required">*</span></label>
+                        <select id="designFeatures" name="designFeatures" required>
+                            <option value="">Select Design Features</option>
+                            <option value="Illustrative">Illustrative</option>
+                            <option value="Plain">Plain</option>
+                            <option value="Emphatic">Emphatic</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="coverConcept">Required Cover Concept <span class="required">*</span></label>
+                        <select id="coverConcept" name="coverConcept" required>
+                            <option value="">Select Number of Concepts</option>
+                            <option value="1">1 Concept</option>
+                            <option value="2">2 Concepts</option>
+                            <option value="3">3 Concepts</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Do you need ISBN? <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="needISBN" value="Yes" required> Yes
+                            </label>
+                            <label>
+                                <input type="radio" name="needISBN" value="No"> No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Inner Paper Type <span class="required">*</span></label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="radio" name="paperType" value="Cream Bond" required> Cream Bond
+                        </label>
+                        <label>
+                            <input type="radio" name="paperType" value="White Bond"> White Bond
+                        </label>
+                        <label>
+                            <input type="radio" name="paperType" value="Other"> Other (specify below)
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="paperTypeOther">If Other, Please Specify:</label>
+                    <input type="text" id="paperTypeOther" name="paperTypeOther" placeholder="Enter paper type">
+                </div>
+                
+                <div class="form-group">
+                    <label>Do you need design services? <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="designing" value="Yes - Both Cover and Inner" required> Yes - Both Cover & Inner
+                        </label>
+                        <label>
+                            <input type="radio" name="designing" value="Yes - Cover Only"> Yes - Cover Only
+                        </label>
+                        <label>
+                            <input type="radio" name="designing" value="No"> No - I have my design
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="section-title">UPLOAD YOUR MANUSCRIPT</div>
+                
+                <div class="form-group">
+                    <label for="manuscriptUpload">Upload Document</label>
+                    <div class="file-upload-area" id="uploadArea">
+                        <div class="file-upload-icon">📁</div>
+                        <div class="file-upload-text">Click to upload or drag and drop</div>
+                        <div class="file-upload-hint">PDF, DOCX, DOC (Max 50MB)</div>
+                        <input type="file" id="manuscriptUpload" name="manuscriptUpload" accept=".pdf,.doc,.docx">
+                        <div class="file-name" id="fileName"></div>
+                    </div>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">Note: You can also send your manuscript via WhatsApp after submitting the order.</p>
+                </div>
+                
+                <div class="section-title">PRICING & DELIVERY</div>
+                
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <label>Estimated Budget (₦)</label>
+                        <input type="number" id="estimatedBudget" name="estimatedBudget" placeholder="0.00" step="0.01">
+                    </div>
+                    <div class="pricing-card">
+                        <label>Agreed Amount (₦) <span class="required">*</span></label>
+                        <input type="number" id="agreedAmount" name="agreedAmount" placeholder="0.00" step="0.01" required>
+                    </div>
+                    <div class="pricing-card">
+                        <label>Part Payment (₦)</label>
+                        <input type="number" id="partPayment" name="partPayment" placeholder="0.00" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expectedDelivery">Expected Delivery Date</label>
+                        <input type="date" id="expectedDelivery" name="expectedDelivery">
+                    </div>
+                    <div class="form-group">
+                        <label for="urgency">Urgency Level</label>
+                        <select id="urgency" name="urgency">
+                            <option value="Standard">Standard (2-3 weeks)</option>
+                            <option value="Rush">Rush (1 week)</option>
+                            <option value="Express">Express (3-5 days)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="additionalNotes">Additional Notes / Special Instructions</label>
+                    <textarea id="additionalNotes" name="additionalNotes" placeholder="Any special requirements or notes for your order..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sourceOfDeal">Source of Deal <span class="required">*</span></label>
+                    <select id="sourceOfDeal" name="sourceOfDeal" required>
+                        <option value="">Select One</option>
+                        <option value="Social Media">Social Media</option>
+                        <option value="Referral">Referral</option>
+                        <option value="Return Customer">Return Customer</option>
+                    </select>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 20px; color: #666; font-weight: 600;">Preparing your order...</p>
+                </div>
+                
+                <div class="response-message" id="responseMessage"></div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn-submit">Submit Order</button>
+                    <button type="reset" class="btn-reset">Clear Form</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Set today's date by default
+        document.getElementById('date').valueAsDate = new Date();
+        
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('manuscriptUpload');
+        const fileName = document.getElementById('fileName');
+        
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                fileName.textContent = `✓ ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                fileName.style.display = 'block';
+            }
+        });
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                const file = e.dataTransfer.files[0];
+                fileName.textContent = `✓ ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                fileName.style.display = 'block';
+            }
+        });
+        
+        // Form submission
+        const form = document.getElementById('jobOrderForm');
+        const loading = document.getElementById('loading');
+        const responseMessage = document.getElementById('responseMessage');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Show loading
+            loading.style.display = 'block';
+            responseMessage.style.display = 'none';
+            
+            // YOUR WHATSAPP NUMBER - Change this to your actual WhatsApp number!
+            const whatsappNumber = '2348012345678'; // Format: Country code + number (no + sign, no spaces)
+            
+            // Get all form values
+            const formData = new FormData(form);
+            
+            // Build WhatsApp message
+            const message = `
+*NEW BOOK ORDER - THEC*
+━━━━━━━━━━━━━━━━━━━━━━
+
+📅 *Order Date:* ${formData.get('date')}
+
+👤 *CLIENT INFORMATION*
+Name: ${formData.get('customerName')}
+Phone: ${formData.get('phone')}
+Address: ${formData.get('address')}
+
+📚 *BOOK DETAILS*
+Title: ${formData.get('bookTitle')}
+Author: ${formData.get('author')}
+Package Type: ${formData.get('packageType')}
+Book Size: ${formData.get('bookSize')}
+Delivery Mode: ${formData.get('deliveryMode')}
+Total Pages: ${formData.get('projectedPages')}
+Number of Copies: ${formData.get('quantity')}
+Cover GSM: ${formData.get('coverGsm') || 'Not specified'}
+
+🎨 *DESIGN SPECIFICATIONS*
+Font Size: ${formData.get('fontSize') || 'Not specified'}
+Font Type: ${formData.get('fontType') || 'Not specified'}
+Line Spacing: ${formData.get('lineSpacing') || 'Not specified'}
+Binding Type: ${formData.get('bindingType')}
+Lamination: ${formData.get('laminationType') || 'Not specified'}
+Design Features: ${formData.get('designFeatures')}
+Required Cover Concepts: ${formData.get('coverConcept')}
+Need ISBN: ${formData.get('needISBN')}
+Paper Type: ${formData.get('paperType')}
+${formData.get('paperTypeOther') ? 'Other Paper Type: ' + formData.get('paperTypeOther'): ''}
+Design Services: ${formData.get('designing')}
+
+💰 *PRICING & DELIVERY*
+Estimated Budget: ₦${formData.get('estimatedBudget') || '0'}
+Agreed Amount: ₦${formData.get('agreedAmount')}
+Part Payment: ₦${formData.get('partPayment') || '0'}
+Expected Delivery: ${formData.get('expectedDelivery') || 'Not specified'}
+Urgency: ${formData.get('urgency')}
+
+📝 *ADDITIONAL INFORMATION*
+Notes: ${formData.get('additionalNotes') || 'None'}
+Source of Deal: ${formData.get('sourceOfDeal')}
+
+━━━━━━━━━━━━━━━━━━━━━━
+Submitted via Thec Job Order Form
+            `.trim();
+            
+            // Encode message for URL
+            const encodedMessage = encodeURIComponent(message);
+            
+            // Create WhatsApp URL
+            const whatsappURL = `https://wa.me/${+2348167341862}?text=${encodedMessage}`;
+            
+            // Hide loading and show success
+            loading.style.display = 'none';
+            responseMessage.className = 'response-message success';
+            responseMessage.innerHTML = `
+                <h3 style="margin-bottom: 10px;">✓ Opening WhatsApp...</h3>
+                <p>Your order details are ready to send. Click the button below if WhatsApp doesn't open automatically.</p>
+                <button onclick="window.open('${whatsappURL}', '_blank')" style="margin-top: 15px; padding: 12px 30px; background: #25D366; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: 600;">
+                    📱 Open WhatsApp
+                </button>
+            `;
+            responseMessage.style.display = 'block';
+            responseMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Open WhatsApp automatically
+            setTimeout(() => {
+                window.open(whatsappURL, '_blank');
+            }, 1000);
+        });
+        
+        // Reset button handler
+        form.addEventListener('reset', () => {
+            responseMessage.style.display = 'none';
+            fileName.style.display = 'none';
+            document.getElementById('date').valueAsDate = new Date();
+        });
+    </script>
+</body>
+</html>
